@@ -300,7 +300,7 @@ extension ProtocolClient: ProtocolClientInterface {
             pendingRequestCallbacks.enqueue { $0.cancel() }
             onResult(.complete(code: error.code, error: error, trailers: nil))
         }
-        let toTyped:
+        let transformToTypedResult:
             @Sendable (
                 StreamResult<Data>, @escaping @Sendable (StreamResult<Output>) -> Void
             ) -> Void = { interceptedResult, proceed in
@@ -320,7 +320,7 @@ extension ProtocolClient: ProtocolClientInterface {
                     interceptorChain.interceptors.map { $0.handleStreamRawResult },
                     firstInFirstOut: false,
                     initial: .headers(responseHeaders),
-                    transform: toTyped,
+                    transform: transformToTypedResult,
                     then: interceptorChain.interceptors.map { $0.handleStreamResult },
                     finish: onResult
                 )
@@ -350,7 +350,7 @@ extension ProtocolClient: ProtocolClientInterface {
                             interceptorChain.interceptors.map { $0.handleStreamRawResult },
                             firstInFirstOut: false,
                             initial: .message(responseBuffer.prefix(prefixedMessageLength)),
-                            transform: toTyped,
+                            transform: transformToTypedResult,
                             then: interceptorChain.interceptors.map { $0.handleStreamResult },
                             finish: onResult
                         )
@@ -388,7 +388,7 @@ extension ProtocolClient: ProtocolClientInterface {
                     interceptorChain.interceptors.map { $0.handleStreamRawResult },
                     firstInFirstOut: false,
                     initial: .complete(code: code, error: error, trailers: trailers),
-                    transform: toTyped,
+                    transform: transformToTypedResult,
                     then: interceptorChain.interceptors.map { $0.handleStreamResult },
                     finish: onResult
                 )
