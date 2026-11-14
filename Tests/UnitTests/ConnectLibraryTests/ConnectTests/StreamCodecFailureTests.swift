@@ -24,7 +24,8 @@ struct StreamCodecFailureTests {
     @Test
     func deserializeFailureEndsStreamWithError() async throws {
         let transport = RecordingStreamHTTPClient()
-        let stream: any BidirectionalAsyncStreamInterface<Request, Response> = Self
+        let stream: any BidirectionalAsyncStreamInterface<Request, Response> =
+            Self
             .makeClient(transport: transport, codec: JSONCodec())
             .bidirectionalStream(path: "/test", headers: [:])
         try stream.send(Request())
@@ -59,7 +60,8 @@ struct StreamCodecFailureTests {
     @Test
     func serializeFailureEndsStreamWithError() async throws {
         let transport = RecordingStreamHTTPClient()
-        let stream: any BidirectionalAsyncStreamInterface<Request, Response> = Self
+        let stream: any BidirectionalAsyncStreamInterface<Request, Response> =
+            Self
             .makeClient(transport: transport, codec: FailingSerializeCodec())
             .bidirectionalStream(path: "/test", headers: [:])
         try stream.send(Request())
@@ -85,7 +87,8 @@ struct StreamCodecFailureTests {
     @Test
     func unarySerializeFailureReturnsInternalError() async {
         let transport = RecordingStreamHTTPClient()
-        let response: ResponseMessage<Response> = await Self
+        let response: ResponseMessage<Response> =
+            await Self
             .makeClient(transport: transport, codec: FailingSerializeCodec())
             .unary(path: "/test", idempotencyLevel: .unknown, request: Request(), headers: [:])
 
@@ -97,7 +100,8 @@ struct StreamCodecFailureTests {
     @Test
     func unaryDeserializeFailureReturnsInternalError() async {
         let transport = RecordingStreamHTTPClient(unaryResponseBody: Data("{".utf8))
-        let response: ResponseMessage<Response> = await Self
+        let response: ResponseMessage<Response> =
+            await Self
             .makeClient(transport: transport, codec: JSONCodec())
             .unary(path: "/test", idempotencyLevel: .unknown, request: Request(), headers: [:])
 
@@ -159,14 +163,15 @@ private final class RecordingStreamHTTPClient: HTTPClientInterface, Sendable {
             Issue.record("Unexpected unary request")
             return Cancelable {}
         }
-        onResponse(HTTPResponse(
-            code: .ok,
-            headers: ["content-type": ["application/json"]],
-            message: body,
-            trailers: [:],
-            error: nil,
-            tracingInfo: nil
-        ))
+        onResponse(
+            HTTPResponse(
+                code: .ok,
+                headers: ["content-type": ["application/json"]],
+                message: body,
+                trailers: [:],
+                error: nil,
+                tracingInfo: nil
+            ))
         return Cancelable {}
     }
 
